@@ -33,27 +33,27 @@ public class CountersMonitor {
         return numMethods;
     }
 
-    public synchronized void incClasses() {
+    public void incClasses() {
         this.numClasses++;
     }
 
-    public synchronized void incFields() {
+    public void incFields() {
         this.numFields++;
     }
 
-    public synchronized void incPackages() {
+    public void incPackages() {
         this.numPackages++;
     }
 
-    public synchronized void incInterfaces() {
+    public void incInterfaces() {
         this.numInterfaces++;
     }
 
-    public synchronized void incEnums() {
+    public void incEnums() {
         this.numEnums++;
     }
 
-    public synchronized void incMethods() {
+    public void incMethods() {
         this.numMethods++;
     }
 

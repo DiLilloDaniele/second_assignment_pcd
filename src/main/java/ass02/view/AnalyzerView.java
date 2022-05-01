@@ -1,13 +1,13 @@
 package ass02.view;
-import ass02.ProjectAnalyzer;
-import ass02.implementation.ProjectAnalyzerImpl;
+import ass02.ProjectElem;
 import ass02.implementation.ProjectElemImpl;
-import ass02.implementation.ProjectElemImpl.Type;
 import ass02.passiveComponents.CountersMonitor;
-import ass02.verticle.VerticleView;
+import ass02.verticle.AnalyzerVerticle;
 import io.vertx.core.Vertx;
+import io.vertx.core.eventbus.EventBus;
 
 import javax.swing.*;
+import java.util.function.Consumer;
 
 public class AnalyzerView {
 
@@ -102,31 +102,35 @@ public class AnalyzerView {
 
     private void start(String path){
         vertx = Vertx.vertx();
-        vertx.deployVerticle(new VerticleView(path, (i) -> {
-            System.out.println("CALLBACK");
-            switch(i.getTypeAsString()) {
-                case Class:
+        EventBus eb = vertx.eventBus();
+        Consumer<ProjectElem> callback = (i) -> {
+            eb.publish("update-gui", i.getTypeAsString());
+        };
+        eb.consumer("update-gui", message -> {
+            switch(message.body().toString()) {
+                case "Class":
                     countersMonitor.incClasses();
                     break;
-                case Package:
+                case "Package":
                     countersMonitor.incPackages();
                     break;
-                case Field:
+                case "Field":
                     countersMonitor.incFields();
                     break;
-                case Interface:
+                case "Interface":
                     countersMonitor.incInterfaces();
                     break;
-                case Method:
+                case "Method":
                     countersMonitor.incMethods();
                     break;
-                case Enum:
+                case "Enum":
                     countersMonitor.incEnums();
                     break;
             }
             SwingUtilities.invokeLater(() -> {
                 display();
             });
-        }));
+        });
+        vertx.deployVerticle(new AnalyzerVerticle(path, callback));
     }
 }

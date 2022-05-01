@@ -28,8 +28,13 @@ public class ProjectElemImpl implements ProjectElem {
     }
 
     @Override
-    public Type getTypeAsString() {
+    public Type getType() {
         return type;
+    }
+
+    @Override
+    public String getTypeAsString() {
+        return type.toString();
     }
 
     @Override

@@ -6,7 +6,9 @@ public interface ProjectElem {
 
     String getNameAsString();
 
-    Type getTypeAsString();
+    String getTypeAsString();
+
+    Type getType();
 
     void setName(String name);
 
