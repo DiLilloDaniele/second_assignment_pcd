@@ -24,6 +24,7 @@ dependencies {
     implementation(files("JPF/jpf-core/build/jpf-classes.jar"))
     implementation("io.vertx:vertx-core:4.2.6")
     implementation("com.github.javaparser:javaparser-symbol-solver-core:3.24.2")
+    implementation "io.reactivex.rxjava3:rxjava:3.1.4"
 }
 /*
 tasks.getByName<Test>("test") {

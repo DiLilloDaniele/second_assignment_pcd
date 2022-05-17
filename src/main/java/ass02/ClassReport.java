@@ -15,5 +15,23 @@ public interface ClassReport {
 	List<ClassReport> getInnerClasses();
 
 	List<String> getEnumInfos();
+
+	void setFullPath(String fullPath);
+
+	void setFullClassName(String fullClassName);
+
+	void addMethodInfo(MethodInfo methodInfo);
+
+	void addFieldInfo(FieldInfo methodInfo);
+
+	void setSrcFullFileName(String srcFullFileName);
+
+	void setMethodInfos(List<MethodInfo> methodInfos);
+
+	void setFieldInfos(List<FieldInfo> fieldInfos);
+
+	void addInnerClass(ClassReport innerClass);
+
+	void addEnum(String name);
 	
 }

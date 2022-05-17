@@ -21,9 +21,6 @@ public class VisitorWithCallback extends VoidVisitorAdapter<Consumer<ProjectElem
     public void visit(ClassOrInterfaceDeclaration cd, Consumer<ProjectElem> callback) {
         super.visit(cd, callback);
         System.out.println("CERCO CLASSE");
-        /**
-         * deve valere sia per classi, inner class ecc???
-         */
         ProjectElem projectElem;
         Type type = Type.None;
         if(cd.isInterface()) {

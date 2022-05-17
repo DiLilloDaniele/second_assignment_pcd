@@ -1,6 +1,7 @@
 package ass02;
 
 import ass02.implementation.ProjectAnalyzerImpl;
+import ass02.implementation.ReactiveAnalyzerImpl;
 import ass02.view.AnalyzerView;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;

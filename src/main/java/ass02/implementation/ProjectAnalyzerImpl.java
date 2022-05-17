@@ -1,6 +1,7 @@
 package ass02.implementation;
 
 import ass02.*;
+import ass02.passiveComponents.CountersMonitor;
 import ass02.utility.*;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
@@ -17,9 +18,11 @@ import java.util.function.Consumer;
 public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     Vertx vertx;
+    CountersMonitor monitor;
 
-    public ProjectAnalyzerImpl(final Vertx vertx) {
+    public ProjectAnalyzerImpl(final Vertx vertx, final CountersMonitor countersMonitor) {
         this.vertx = vertx;
+        this.monitor = countersMonitor;
     }
 
     @Override
@@ -180,7 +183,7 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     @Override
     public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
-        //vertx = Vertx.vertx();
+        //TODO invece di blocchi innestati fare una future e quando pronta fare le altre execute?
         vertx.executeBlocking((s) -> {
             File folder = new File(srcProjectFolderName);
             File[] listOfFiles = folder.listFiles();
@@ -203,6 +206,36 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
                 }, false);
 
+            }
+        }, false);
+
+    }
+
+
+    public void analyzeProject(String srcProjectFolderName, String topic) {
+        vertx.executeBlocking((s) -> {
+            File folder = new File(srcProjectFolderName);
+            File[] listOfFiles = folder.listFiles();
+            for (File file : listOfFiles) {
+                if(!monitor.closed.get()) {
+                    Future<ProjectReport> future = vertx.executeBlocking((i) -> {
+                        try {
+                            if(file.isFile()) {
+                                CompilationUnit cu = StaticJavaParser.parse(file);
+                                VisitorWithTopic visitorWithTopic = new VisitorWithTopic(this.vertx.eventBus());
+                                visitorWithTopic.visit(cu,topic);
+                            } else {
+                                //è un package
+                                ProjectElem projectElem = new ProjectElemImpl(file.getName(), ProjectElemImpl.Type.Package);
+                                this.vertx.eventBus().publish(topic, "Package-" + projectElem.getNameAsString());
+                                analyzeProject(file.getPath(), topic);
+                            }
+                        } catch (Exception e) {
+                            //e.printStackTrace();
+                        }
+
+                    }, false);
+                }
             }
         }, false);
 

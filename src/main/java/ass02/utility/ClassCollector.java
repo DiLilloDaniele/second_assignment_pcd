@@ -16,21 +16,21 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 import java.util.Optional;
 
-public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
+public class ClassCollector extends VoidVisitorAdapter<ClassReport> {
 
     private boolean innerSearch = false;
 
-    public void visit(PackageDeclaration fd, ClassReportImpl collector) {
+    public void visit(PackageDeclaration fd, ClassReport collector) {
         super.visit(fd, collector);
         collector.setFullClassName(fd.getNameAsString());
     }
 
-    public void visit(ClassOrInterfaceDeclaration cd, ClassReportImpl collector) {
+    public void visit(ClassOrInterfaceDeclaration cd, ClassReport collector) {
         if(cd.isInnerClass() && !innerSearch) {
             try {
                 System.out.println("Inner class: " + cd.getNameAsString());
                 ClassCollector analyzer = new ClassCollector();
-                ClassReportImpl innerClass = new ClassReportImpl();
+                ClassReport innerClass = new ClassReportImpl();
                 analyzer.setAsInnerSearch();
                 analyzer.visit(cd, innerClass);
                 collector.addInnerClass(innerClass);
@@ -45,7 +45,7 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         }
     }
 
-    public void visit(MethodDeclaration md, ClassReportImpl collector) {
+    public void visit(MethodDeclaration md, ClassReport collector) {
         super.visit(md, collector);
 
         String name = md.getNameAsString();
@@ -56,7 +56,7 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         collector.addMethodInfo(methodInfo);
     }
 
-    public void visit(FieldDeclaration fd, ClassReportImpl collector) {
+    public void visit(FieldDeclaration fd, ClassReport collector) {
         super.visit(fd, collector);
         String name = fd.getVariable(0).getNameAsString();
         String type = fd.getElementType().toString();
@@ -64,7 +64,7 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReportImpl> {
         collector.addFieldInfo(fieldInfo);
     }
 
-    public void visit(EnumDeclaration ed, ClassReportImpl collector) {
+    public void visit(EnumDeclaration ed, ClassReport collector) {
         super.visit(ed, collector);
         collector.addEnum(ed.getNameAsString());
     }

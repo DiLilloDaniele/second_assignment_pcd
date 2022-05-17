@@ -12,14 +12,14 @@ import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 import java.util.List;
 import java.util.Optional;
 
-public class InterfacesCollector extends VoidVisitorAdapter<InterfaceReportImpl> {
+public class InterfacesCollector extends VoidVisitorAdapter<InterfaceReport> {
 
-    public void visit(PackageDeclaration fd, InterfaceReportImpl collector) {
+    public void visit(PackageDeclaration fd, InterfaceReport collector) {
         super.visit(fd, collector);
         //collector.add(fd.getNameAsString());
     }
 
-    public void visit(ClassOrInterfaceDeclaration cd, InterfaceReportImpl collector) {
+    public void visit(ClassOrInterfaceDeclaration cd, InterfaceReport collector) {
         super.visit(cd, collector);
         collector.setInterfaceName(cd.getNameAsString());
         Optional<String> opt = cd.getFullyQualifiedName();
@@ -27,7 +27,7 @@ public class InterfacesCollector extends VoidVisitorAdapter<InterfaceReportImpl>
             System.out.println("FULLY QUALIFIED NAME: " + opt.get());*/
     }
 
-    public void visit(MethodDeclaration md, InterfaceReportImpl collector) {
+    public void visit(MethodDeclaration md, InterfaceReport collector) {
         super.visit(md, collector);
         //getBegin e getEnd per la position
 
