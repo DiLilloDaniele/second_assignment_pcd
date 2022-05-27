@@ -1,5 +1,7 @@
 package simulator;
 
+import simulator.controller.Controller;
+import simulator.controller.SimulatorWithExecutors;
 import simulator.model.Body;
 import simulator.model.Boundary;
 import simulator.model.P2d;
@@ -11,6 +13,7 @@ import java.awt.event.KeyListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 
 /**
  * Simulation view
@@ -21,6 +24,7 @@ import java.util.ArrayList;
 public class SimulationView {
         
 	private VisualiserFrame frame;
+	private static final SimulatorWithExecutors.ComputationType TYPE_EXEC = SimulatorWithExecutors.ComputationType.ForkJoin;
 	
     /**
      * Creates a view of the specified size (in pixels)
@@ -28,8 +32,8 @@ public class SimulationView {
      * @param w
      * @param h
      */
-    public SimulationView(int w, int h){
-    	frame = new VisualiserFrame(w,h);
+    public SimulationView(int w, int h, Controller controller){
+    	frame = new VisualiserFrame(w,h, controller);
     }
         
     public void display(ArrayList<Body> bodies, double vt, long iter, Boundary bounds){
@@ -40,11 +44,34 @@ public class SimulationView {
 
         private VisualiserPanel panel;
 
-        public VisualiserFrame(int w, int h){
+        public VisualiserFrame(int w, int h, Controller controller){
             setTitle("Bodies Simulation");
             setSize(w,h);
             setResizable(false);
             panel = new VisualiserPanel(w,h);
+			getContentPane().setLayout(
+					new BoxLayout(getContentPane(), BoxLayout.PAGE_AXIS)
+			);
+			JButton startButton = new JButton("Start");
+			JButton stopButton = new JButton("Stop");
+			JButton zoomUpButton = new JButton("+");
+			JButton zoomDownButton = new JButton("-");
+			zoomDownButton.addActionListener((ev) -> {
+				VisualiserPanel.scale *= 0.9;
+			});
+			zoomUpButton.addActionListener((ev) -> {
+				VisualiserPanel.scale *= 1.1;
+			});
+			startButton.addActionListener((ev) -> {
+				controller.executeFromGUI(5000, SimulationView.TYPE_EXEC);
+			});
+			stopButton.addActionListener((ev) -> {
+				controller.stopExecution();
+			});
+			getContentPane().add(startButton);
+			getContentPane().add(stopButton);
+			getContentPane().add(zoomUpButton);
+			getContentPane().add(zoomDownButton);
             getContentPane().add(panel);
             addWindowListener(new WindowAdapter(){
     			public void windowClosing(WindowEvent ev){
@@ -78,7 +105,7 @@ public class SimulationView {
     	
     	private long nIter;
     	private double vt;
-    	private double scale = 1;
+    	private static double scale = 1;
     	
         private long dx;
         private long dy;

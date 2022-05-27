@@ -5,6 +5,7 @@ import ass02.InterfaceReport;
 import ass02.PackageReport;
 import ass02.ProjectReport;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,6 +14,11 @@ public class ProjectReportImpl implements ProjectReport {
     private List<ClassReport> classReports;
     private List<PackageReport> packageReports;
     private ClassReport mainClass;
+
+    public ProjectReportImpl() {
+        classReports = new ArrayList<>();
+        packageReports = new ArrayList<>();
+    }
 
     @Override
     public ClassReport getMainClass() {
@@ -46,7 +52,6 @@ public class ProjectReportImpl implements ProjectReport {
 
     @Override
     public ClassReport getClassReport(String fullClassName) {
-        //TODO gestire errore
         return classReports.stream().filter(i -> i.getFullClassName() == fullClassName).collect(Collectors.toList()).get(0);
     }
 }

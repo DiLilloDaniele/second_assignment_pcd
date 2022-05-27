@@ -6,11 +6,9 @@ import simulator.strategy.ComputeTotalForce;
 
 import java.util.concurrent.Callable;
 
-public class UpdateVelocityCallable implements Callable<Integer> {
+public class UpdateVelocityCallable extends AbstractCallable implements Callable<Integer> {
 
-    private Body body;
     private ComputeTotalForce computeTotalForceStrategy;
-    private double dt;
 
     public UpdateVelocityCallable(final Body body, final ComputeTotalForce computeTotalForceStrategy, final double dt) {
         this.body = body;

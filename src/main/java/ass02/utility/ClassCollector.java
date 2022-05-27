@@ -28,7 +28,6 @@ public class ClassCollector extends VoidVisitorAdapter<ClassReport> {
     public void visit(ClassOrInterfaceDeclaration cd, ClassReport collector) {
         if(cd.isInnerClass() && !innerSearch) {
             try {
-                System.out.println("Inner class: " + cd.getNameAsString());
                 ClassCollector analyzer = new ClassCollector();
                 ClassReport innerClass = new ClassReportImpl();
                 analyzer.setAsInnerSearch();

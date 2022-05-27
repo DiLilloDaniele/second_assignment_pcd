@@ -5,10 +5,8 @@ import simulator.model.Boundary;
 
 import java.util.concurrent.Callable;
 
-public class CheckCollisionsCallable implements Callable<Integer> {
+public class CheckCollisionsCallable extends AbstractCallable implements Callable<Integer> {
 
-    private Body body;
-    private double dt;
     private Boundary bounds;
 
     public CheckCollisionsCallable(final Body body, final double dt, final Boundary bounds) {

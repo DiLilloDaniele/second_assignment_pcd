@@ -1,10 +1,12 @@
 package ass02.implementation;
 
 import ass02.ProjectElem;
+import ass02.passiveComponents.CountersMonitor;
 import ass02.utility.VisitorReactive;
 import ass02.utility.VisitorWithCallback;
 import com.github.javaparser.StaticJavaParser;
 import com.github.javaparser.ast.CompilationUnit;
+import io.reactivex.rxjava3.core.BackpressureStrategy;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.disposables.Disposable;
 import io.reactivex.rxjava3.schedulers.Schedulers;
@@ -20,11 +22,14 @@ public class ReactiveAnalyzerWithEmitter extends ReactiveAnalyzerImpl {
 
     private Disposable disposable;
 
+    public ReactiveAnalyzerWithEmitter(CountersMonitor monitor) {
+        super(monitor);
+    }
+
     @Override
     public void analyzeProject(String srcProjectFolderName, PublishSubject<ProjectElem> pubsub) {
         Observable<File> source = Observable.create(emitter -> {
             new Thread(() -> {
-                System.out.println(Thread.currentThread().getName() + ": INIZIO IL PARSING");
                 File[] filesArray = new File(srcProjectFolderName).listFiles();
                 List<File> files = Arrays.stream(filesArray).collect(Collectors.toList());
                 for (File f : files) {
@@ -34,7 +39,6 @@ public class ReactiveAnalyzerWithEmitter extends ReactiveAnalyzerImpl {
         });
 
         this.disposable = source.observeOn(Schedulers.computation()).subscribe((file) -> {
-            System.out.println(Thread.currentThread().getName() + ": " + file.getName());
             if(file.isFile()) {
                 try {
                     CompilationUnit cu = StaticJavaParser.parse(file);
@@ -44,7 +48,6 @@ public class ReactiveAnalyzerWithEmitter extends ReactiveAnalyzerImpl {
                     ex.printStackTrace();
                 }
             } else {
-                //è un package
                 ProjectElem projectElem = new ProjectElemImpl(file.getName(), ProjectElemImpl.Type.Package);
                 pubsub.onNext(projectElem);
                 analyzeProject(file.getPath(), pubsub);

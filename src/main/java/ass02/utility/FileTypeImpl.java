@@ -6,7 +6,7 @@ public class FileTypeImpl {
         Class,
         Interface
     }
-    private FileType fileType = FileType.None;
+    public FileType fileType = FileType.None;
     private boolean isMainClass = false;
 
     public void setAsClass() {

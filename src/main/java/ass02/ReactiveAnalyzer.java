@@ -18,4 +18,6 @@ public interface ReactiveAnalyzer {
 
     void analyzeProject(String srcProjectFolderName, PublishSubject<ProjectElem> source);
 
+    void stop();
+
 }

@@ -39,12 +39,18 @@ public class Body {
     public int getId() {
     	return id;
     }
-    
-    public boolean equals(Object b) {
-    	return ((Body)b).id == id;
+
+    @Override
+    public Body clone() {
+        return new Body(this.id, this.pos, this.vel, this.mass);
     }
-    
-    
+
+    public boolean equals(Object b) {
+        return ((Body)b).id == id && ((Body)b).pos.getX() == pos.getX()
+                && ((Body)b).pos.getY() == pos.getY()
+                && ((Body)b).vel.getX() == vel.getX()
+                && ((Body)b).getMass() == mass;
+    }
     /**
      * Update the position, according to current velocity
      * 

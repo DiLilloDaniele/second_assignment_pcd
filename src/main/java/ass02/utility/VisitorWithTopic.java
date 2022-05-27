@@ -21,7 +21,6 @@ public class VisitorWithTopic extends VoidVisitorAdapter<String> {
 
     public void visit(ClassOrInterfaceDeclaration cd, String topic) {
         super.visit(cd, topic);
-        //System.out.println("CERCO CLASSE");
         String type = "";
         if(cd.isInterface()) {
             type = "Interface-" + cd.getNameAsString();
@@ -33,19 +32,16 @@ public class VisitorWithTopic extends VoidVisitorAdapter<String> {
 
     public void visit(MethodDeclaration md, String topic) {
         super.visit(md, topic);
-        //System.out.println("CERCO METODO");
         this.eventBus.publish(topic, "Method-" + md.getNameAsString());
     }
 
     public void visit(FieldDeclaration fd, String topic) {
         super.visit(fd, topic);
-        //System.out.println("CERCO CAMPO");
         this.eventBus.publish(topic, "Field-" + fd.getVariables().get(0).getNameAsString());
     }
 
     public void visit(EnumDeclaration ed, String topic) {
         super.visit(ed, topic);
-        //System.out.println("CERCO ENUM");
         this.eventBus.publish(topic, "Enum-" + ed.getNameAsString());
     }
 

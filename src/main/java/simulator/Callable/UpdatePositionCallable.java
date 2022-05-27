@@ -5,10 +5,8 @@ import simulator.model.Boundary;
 
 import java.util.concurrent.Callable;
 
-public class UpdatePositionCallable implements Callable<Integer> {
+public class UpdatePositionCallable extends AbstractCallable implements Callable<Integer> {
 
-    private Body body;
-    private double dt;
     private Boundary bounds;
 
     public UpdatePositionCallable(final Body body, final double dt, final Boundary bounds) {

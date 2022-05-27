@@ -20,7 +20,6 @@ public class VisitorWithCallback extends VoidVisitorAdapter<Consumer<ProjectElem
 
     public void visit(ClassOrInterfaceDeclaration cd, Consumer<ProjectElem> callback) {
         super.visit(cd, callback);
-        System.out.println("CERCO CLASSE");
         ProjectElem projectElem;
         Type type = Type.None;
         if(cd.isInterface()) {
@@ -34,21 +33,18 @@ public class VisitorWithCallback extends VoidVisitorAdapter<Consumer<ProjectElem
 
     public void visit(MethodDeclaration md, Consumer<ProjectElem> callback) {
         super.visit(md, callback);
-        System.out.println("CERCO METODO");
         ProjectElem projectElem = new ProjectElemImpl(md.getNameAsString(), Type.Method);
         callback.accept(projectElem);
     }
 
     public void visit(FieldDeclaration fd, Consumer<ProjectElem> callback) {
         super.visit(fd, callback);
-        System.out.println("CERCO CAMPO");
         ProjectElem projectElem = new ProjectElemImpl(fd.getVariable(0).getNameAsString(), Type.Field);
         callback.accept(projectElem);
     }
 
     public void visit(EnumDeclaration ed, Consumer<ProjectElem> callback) {
         super.visit(ed, callback);
-        System.out.println("CERCO ENUM");
         ProjectElem projectElem = new ProjectElemImpl(ed.getNameAsString(), Type.Enum);
         callback.accept(projectElem);
     }

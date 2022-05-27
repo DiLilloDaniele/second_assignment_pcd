@@ -40,7 +40,6 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
                 i.complete(report);
 
             } catch (Exception e) {
-                System.out.println(e.getMessage());
                 e.printStackTrace();
                 i.fail("ERRORE");
             }
@@ -56,11 +55,6 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
                 File myFile = new File(srcClassPath);
                 report.setFullPath(myFile.getAbsolutePath());
                 CompilationUnit cu = StaticJavaParser.parse(myFile);
-                if(cu.findAll(ClassOrInterfaceDeclaration.class).stream().count() > 1) {
-                    System.out.println("IS A FILE");
-                } else {
-                    System.out.println("IS A CLASS");
-                }
                 ClassCollector classCollector = new ClassCollector();
                 classCollector.visit(cu, report);
                 i.complete(report);
@@ -150,7 +144,6 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
                             fut.onComplete((AsyncResult<ClassReport> res) -> {
                                 if(res != null) {
                                     if(fileType.isMainClass()) {
-                                        //vede sempre il suo file type?
                                         projectReport.setMainClass(res.result());
                                     }
                                     projectReport.addClassReport(res.result());
@@ -183,7 +176,6 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
 
     @Override
     public void analyzeProject(String srcProjectFolderName, Consumer<ProjectElem> callback) {
-        //TODO invece di blocchi innestati fare una future e quando pronta fare le altre execute?
         vertx.executeBlocking((s) -> {
             File folder = new File(srcProjectFolderName);
             File[] listOfFiles = folder.listFiles();
@@ -195,7 +187,6 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
                             VisitorWithCallback visitorWithCallback = new VisitorWithCallback();
                             visitorWithCallback.visit(cu,callback);
                         } else {
-                            //è un package
                             ProjectElem projectElem = new ProjectElemImpl(file.getName(), ProjectElemImpl.Type.Package);
                             callback.accept(projectElem);
                             analyzeProject(file.getPath(), callback);
@@ -225,16 +216,17 @@ public class ProjectAnalyzerImpl implements ProjectAnalyzer {
                                 VisitorWithTopic visitorWithTopic = new VisitorWithTopic(this.vertx.eventBus());
                                 visitorWithTopic.visit(cu,topic);
                             } else {
-                                //è un package
                                 ProjectElem projectElem = new ProjectElemImpl(file.getName(), ProjectElemImpl.Type.Package);
                                 this.vertx.eventBus().publish(topic, "Package-" + projectElem.getNameAsString());
                                 analyzeProject(file.getPath(), topic);
                             }
                         } catch (Exception e) {
-                            //e.printStackTrace();
+                            //silently ignored
                         }
 
                     }, false);
+                } else {
+                    break;
                 }
             }
         }, false);

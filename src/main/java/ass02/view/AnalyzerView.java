@@ -7,6 +7,7 @@ import ass02.implementation.ReactiveAnalyzerPubSub;
 import ass02.implementation.ReactiveAnalyzerWithEmitter;
 import ass02.passiveComponents.CountersMonitor;
 import ass02.verticle.AnalyzerVerticle;
+import io.reactivex.rxjava3.core.Flowable;
 import io.reactivex.rxjava3.subjects.PublishSubject;
 import io.vertx.core.Verticle;
 import io.vertx.core.Vertx;
@@ -25,6 +26,7 @@ public class AnalyzerView {
     private JFrame f;
     private CountersMonitor countersMonitor;
     private Vertx vertx;
+    private ReactiveAnalyzer reactiveAnalyzer;
     JLabel classLabel;
     JLabel methodLabel;
     JLabel fieldLabel;
@@ -43,7 +45,7 @@ public class AnalyzerView {
 
     public AnalyzerView() {
         countersMonitor = new CountersMonitor();
-        f = new JFrame();//creating instance of JFrame
+        f = new JFrame();
         f.getContentPane().setLayout(
             new BoxLayout(f.getContentPane(), BoxLayout.Y_AXIS)
         );
@@ -52,7 +54,6 @@ public class AnalyzerView {
             @Override
             public void windowClosing(WindowEvent e) {
                 super.windowClosed(e);
-                System.out.println("Mi sto chiudendo");
                 if(vertx != null)
                     vertx.close();
                 System.exit(0);
@@ -101,9 +102,13 @@ public class AnalyzerView {
                 try {
                     countersMonitor.close();
                     verticle.stop();
+                    //vertx.close();
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 }
+            }
+            if(reactiveAnalyzer != null) {
+                reactiveAnalyzer.stop();
             }
         });
 
@@ -143,8 +148,8 @@ public class AnalyzerView {
         f.getContentPane().add(b);
         f.getContentPane().add(stop);
         f.getContentPane().add(listPane);
-        f.setSize(400, 500);//400 width and 500 height
-        f.setVisible(true);//making the frame visible
+        f.setSize(400, 500);
+        f.setVisible(true);
     }
 
     private void display() {
@@ -166,7 +171,6 @@ public class AnalyzerView {
             String temp = message.body().toString();
             String[] elementsParsed = temp.split("-");
             DefaultListModel<String> model = null;
-            //System.out.println("Size: " + elementsParsed.length);
             switch(elementsParsed[0]) {
                 case "Class":
                     countersMonitor.incClasses();
@@ -193,7 +197,7 @@ public class AnalyzerView {
                     model = listEnums;
                     break;
             }
-            DefaultListModel<String> finalModel = model;
+            final DefaultListModel<String> finalModel = model;
             SwingUtilities.invokeLater(() -> {
                 if(finalModel != null)
                     finalModel.addElement(elementsParsed[1]);
@@ -205,11 +209,8 @@ public class AnalyzerView {
     }
 
     private void rxStart(String path){
-        //TODO INDIVIDUARE COSE IN COMUNE CON start(...)
-        //TODO stop?
         PublishSubject<ProjectElem> source = PublishSubject.<ProjectElem>create();
         source.subscribe((s) -> {
-            //System.out.println(Thread.currentThread().getName() + ": "+ s.getNameAsString());
             DefaultListModel<String> model = null;
             String type = s.getTypeAsString();
             String name = s.getNameAsString();
@@ -248,8 +249,8 @@ public class AnalyzerView {
             });
         }, Throwable::printStackTrace);
 
-        ReactiveAnalyzer analyzer = new ReactiveAnalyzerPubSub();
-        analyzer.analyzeProject(path, source);
+        reactiveAnalyzer = new ReactiveAnalyzerPubSub(new CountersMonitor());
+        reactiveAnalyzer.analyzeProject(path, source);
     }
 
 }
